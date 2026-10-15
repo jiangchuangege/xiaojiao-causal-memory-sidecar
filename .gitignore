@@ -1,0 +1,12 @@
+# 本地状态与本地产物 —— 一律不入库
+# 【为什么这条最重要】turns/ 与 reports/ 里装的是**从你自己的小焦里读出来的会话与经验**，
+#   属于私人数据；export-*.jsonl 更是整库快照。这些推到公开仓库就是泄漏，所以全部忽略。
+turns/
+reports/
+imported.json
+distilled.json
+engine.env
+__pycache__/
+*.pyc
+*.log
+.tok.tmp
