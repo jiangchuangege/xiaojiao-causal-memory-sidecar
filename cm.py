@@ -11,10 +11,32 @@ import threading
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE)                       # C:\xiaojiao\causal-memory
+ROOT = os.path.dirname(HERE)                       # 默认：引擎与本目录同级
 
-# 引擎与库的位置：环境变量优先，其次同目录约定
-EXE = os.environ.get("CAUSAL_MEMORY_EXE") or os.path.join(ROOT, "causal-memory.exe")
+
+def _find_exe():
+    """找引擎可执行文件：环境变量 > 与仓库同级 > 几个常见位置 > 默认。
+
+    【为什么要有"常见位置"这一段】实测：把仓库克隆到别处时，`ROOT/causal-memory.exe`
+    自然不存在（引擎是另外下载的）。要么用户自己设 `CAUSAL_MEMORY_EXE`，
+    要么我们把几个常见落点也找一遍 —— 后者能让"克隆下来就能跑"。
+    """
+    env = os.environ.get("CAUSAL_MEMORY_EXE")
+    if env:
+        return env
+    cands = [
+        os.path.join(ROOT, "causal-memory.exe"),
+        os.path.join(ROOT, "causal-memory", "causal-memory.exe"),
+        r"C:\xiaojiao\causal-memory\causal-memory.exe",
+        os.path.join(os.path.expanduser("~"), "causal-memory", "causal-memory.exe"),
+    ]
+    for c in cands:
+        if c and os.path.exists(c):
+            return c
+    return cands[0]        # 都没有就返回默认位置（错误信息里会带上它，方便对着改）
+
+
+EXE = _find_exe()
 DB = os.environ.get("CAUSAL_MEMORY_DB") or os.path.join(ROOT, "xiaojiao.db")
 # 小焦项目目录（只读它的 self_learn 学习库与日志）
 XIAOJIAO_DIRS = [p for p in (
